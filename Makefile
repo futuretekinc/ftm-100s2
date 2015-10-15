@@ -1,5 +1,5 @@
 TARGET=${CURDIR}/_target
-COMMON_APPS=base busybox
+COMMON_APPS=base busybox iptables zlib openssl openssh libpcap tcpdump
 #COMMON_APPS=busybox openssl iptables zlib openssh libpcap tcpdump lua libubox uci gmp strongswan hotplug2 ntpclient dropbear pcre lighttpd webadmin net-snmp mosquitto node tpgw 
 
 include Makefile.in
