@@ -59,6 +59,7 @@ include/generated
 patches-*
 _install
 openssl-*
+!openssl-*.diff
 
 # quilt's files
 patches
