@@ -1,6 +1,6 @@
 TARGET=ftm-100s
 ROOT=${CURDIR}/_root
-COMMON_APPS=base busybox openssl iptables zlib openssh libpcap tcpdump lua libubox uci gmp strongswan hotplug2 ntpclient dropbear pcre lighttpd webadmin net-snmp mosquitto node tpgw 
+COMMON_APPS=base busybox openssl iptables zlib openssh libpcap tcpdump lua libubox uci gmp strongswan hotplug2 ntpclient dropbear pcre lighttpd qdecoder webadmin net-snmp mosquitto node tpgw 
 
 include Makefile.in
 
