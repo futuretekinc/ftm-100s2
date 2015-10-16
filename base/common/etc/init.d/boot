@@ -83,7 +83,7 @@ start() {
 		[ -n "$rootdev" ] && ln -s "$rootdev" /dev/root
 	}
 
-	mount -t yaffs2 /dev/mtdblock5 /opt/
+#	mount -t yaffs2 /dev/mtdblock5 /opt/
 
 	load_modules /etc/modules.d/*
         rm -f /overlay/etc/config/version

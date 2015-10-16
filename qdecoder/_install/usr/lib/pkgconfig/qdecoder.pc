@@ -1,0 +1,10 @@
+prefix=/home/xtra/ftm-100s2/qdecoder/_install/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: qDecoder
+Description: CGI library for C/C++
+Version: 12 RELEASE
+Libs: -L${libdir} -lqdecoder
+Cflags: -I${includedir}
