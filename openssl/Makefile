@@ -13,8 +13,8 @@ check:
 
 configure: check
 	if [ ! -f .configured ] ; then \
-		(export CLFAGS=-fPIC; cd ${APP}${VERSION}; ./Configure \
-		--prefix=${PREFIX} shared linux-armv5); \
+		(cd ${APP}${VERSION}; ./Configure \
+		--prefix=${PREFIX} linux-cortina); \
 		echo "yes" > .configured; \
 	fi
 
