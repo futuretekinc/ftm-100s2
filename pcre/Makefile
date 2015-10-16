@@ -1,26 +1,22 @@
 include ../Makefile.in
 
-BUILD_OPTIONS=AR="${AR} r"
-INSTALL_OPTIONS=INSTALL_PREFIX=${DESTDIR}
-
-APP=openssl
-VERSION=-1.0.2d
+APP=pcre
+VERSION=-8.37
 
 all: configure build install
 
 check:
 	$(call check_package,${APP}${VERSION})
 
-configure: check
-	if [ ! -f .configured ] ; then \
-		(cd ${APP}${VERSION}; ./Configure \
-		--prefix=${PREFIX} shared linux-cortina); \
-		echo "yes" > .configured; \
-	fi
-
-build: configure 
+build:
 	$(call build_package,${APP}${VERSION})
 
+configure: check
+	if [ ! -f .configured ] ; then \
+		(cd ${APP}${VERSION}; ./configure --host=${HOST} --prefix=${PREFIX});\
+		echo "yes" > .configured; \
+	fi;
+	
 install:
 	$(call install_package,${APP}${VERSION})
 

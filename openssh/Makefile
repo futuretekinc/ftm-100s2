@@ -2,11 +2,11 @@ include ../Makefile.in
 
 APP=openssh
 VERSION=-7.1p1
-SSLDIR=${CURDIR}/../openssl/_install/usr/local/ssl
+SSLDIR=${CURDIR}/../openssl/_install/usr
 ZLIBDIR=${CURDIR}/../zlib/_install/usr
-CFLAGS="-I${CURDIR}/../openssl/_install/usr/local/ssl/include"
-LDFLAGS="-L${CURDIR}/../openssl/_install/usr/local/ssl/lib"
-
+CFLAGS="-I${CURDIR}/../openssl/_install/usr/include"
+LDFLAGS="-L${CURDIR}/../openssl/_install/usr/lib"
+LD=${CC}
 all: configure build install
 
 check:
@@ -24,9 +24,7 @@ configure: check
 			--without-stackprotect \
 			CFLAGS=${CFLAGS} \
 			LDFLAGS=${LDFLAGS} \
-			CC=${CC} \
-			LD=${LD} \
-			AR=${AR}); \
+			LD=${CC}); \
 		echo "yes" > .configured ;\
 	fi; 
 

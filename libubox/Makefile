@@ -1,10 +1,7 @@
 include ../Makefile.in
 
-BUILD_OPTIONS=AR="${AR} r"
-INSTALL_OPTIONS=INSTALL_PREFIX=${DESTDIR}
-
-APP=openssl
-VERSION=-1.0.2d
+APP=libubox
+VERSION=
 
 all: configure build install
 
@@ -13,10 +10,9 @@ check:
 
 configure: check
 	if [ ! -f .configured ] ; then \
-		(cd ${APP}${VERSION}; ./Configure \
-		--prefix=${PREFIX} shared linux-cortina); \
+		(cd ${APP}; cmake -D CMAKE_C_COMPILER=${CC} -D CMAKE_INSTALL_PREFIX:PATH=${PREFIX} .);\
 		echo "yes" > .configured; \
-	fi
+	fi;
 
 build: configure 
 	$(call build_package,${APP}${VERSION})
