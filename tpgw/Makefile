@@ -1,26 +1,41 @@
 include ../Makefile.in
 
 APP=tpgw
+PROGRAM=${APP}
 VERSION=-2015.06.22
+PACKAGE=${PROGRAM}${VERSION}
 
-all: configure build install
+START := $(shell ${CURDIR}/../tools/search_code config/initd_${APP} "START")
+STOP  := $(shell ${CURDIR}/../tools/search_code config/initd_${APP} "STOP")
 
-check:
-	$(call check_package,${APP}${VERSION})
+all: build 
 
-configure: check
+init:
+	$(call init_package,${PACKAGE})
 
-build: configure 
+reinit:
+	$(call reinit_package,${PACKAGE})
 
-install:
+config: init
+
+reconfig: init
+
+build: config
+
+install: build
 	[ -d ${DESTDIR}/opt ] || mkdir -p ${DESTDIR}/opt
-	cp -r ${APP}${VERSION}/* ${DESTDIR}/opt/
-	[ -d ${DESTDIR}/etc/init.d ] || mkdir -p ${DESTDIR}/etc/init.d
-	install -m 755 config/initd_tpgw ${DESTDIR}/etc/init.d/tpgw
-	[ -d ${DESTDIR}/etc/rc.d ] || mkdir -p ${DESTDIR}/etc/rc.d
-	(cd ${DESTDIR}/etc/rc.d; ln -sf ../init.d/tpgw S97tpgw)
+	cp -r ${PACKAGE}/* ${DESTDIR}/opt/
+	[ -d ${DESTDIR}${INITDDIR} ] || mkdir -p ${DESTDIR}${INITDDIR}
+	install -m 755 config/initd_${APP} ${DESTDIR}${INITDDIR}/${APP}
+	[ -d ${DESTDIR}${RCDDIR} ] || mkdir -p ${DESTDIR}${RCDDIR}
+ifneq ($(START),)
+	(cd ${DESTDIR}${RCDDIR}; ln -sf ${INITDDIR}/${APP} S${START}${APP})
+endif
+ifneq ($(STOP),)
+	(cd ${DESTDIR}${RCDDIR}; ln -sf ${INITDDIR}/${APP} K${STOP}${APP})
+endif
 
 clean: ;
 
-distclean: clean
-	$(call distclean_package,${APP}${VERSION})
+distclean: 
+	$(call distclean_package,${PACKAGE})

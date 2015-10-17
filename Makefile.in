@@ -11,10 +11,14 @@ export RANLIB=${CORSS}ranlib
 export PREFIX=/usr
 export DESTDIR=${CURDIR}/_install
 
-define check_package
-	$(eval FILE_NAME := $1${TARGET})
+CONFIGDIR=/etc/config
+INITDDIR=/etc/init.d
+RCDDIR=/etc/rc.d
+
+define init_package
+	$(eval FILE_NAME := $1)
 	if [ ! -d ${FILE_NAME} ]; then \
-		case $(shell ls ../dl | grep ${FILE_NAME} | sed "s/${FILE_NAME}.//") in \
+		case $(shell ls ../dl | grep "${FILE_NAME}\." | sed "s/${FILE_NAME}.//") in \
 			tar.gz) tar xvfz ../dl/${FILE_NAME}.tar.gz;; \
 			tar.bz2) tar xvfj ../dl/${FILE_NAME}.tar.bz2;; \
 			tar.xz) tar xvfJ ../dl/${FILE_NAME}.tar.xz;; \
@@ -24,8 +28,12 @@ define check_package
 		if [ -d patch ]; then \
 			patch -p0 < patch/$1.diff; \
 		fi; \
-		rm -rf .configured;\
 	fi; 
+endef
+
+define reinit_package
+	[ -d $1 ] && rm -rf $1; \
+	$(call init_package,$1)
 endef
 
 define build_package

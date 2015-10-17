@@ -1,26 +1,39 @@
 include ../Makefile.in
 
-export BUILD_OPTIONS=prefix=${DESTDIR}${PREFIX}
 
 APP=qdecoder
+PROGRAM=${APP}
 VERSION=-12.0.4
+PACKAGE=${PROGRAM}${VERSION}
 
-all: configure build install
+CONFIG_OPTIONS=CC=${CC} --host=${HOST} prefix=${DESTDIR}${PREFIX}
+BUILD_OPTIONS=prefix=${DESTDIR}${PREFIX}
 
-check:
-	$(call check_package,${APP}${VERSION})
+all: build 
 
-configure: check
-	(cd ${APP}${VERSION}; ./configure CC=${CC} --host=${HOST} prefix=${DESTDIR}${PREFIX})
+init:
+	$(call init_package,${PACKAGE})
 
-build: configure 
-	$(call build_package,${APP}${VERSION})
+reinit:
+	$(call reinit_package,${PACKAGE})
 
-install:
-	$(call install_package,${APP}${VERSION})
+config: init
+	[ -f .configured ] || (cd ${PACKAGE}; ./configure ${CONFIG_OPTIONS})
+	echo "yes" > .configured
+
+reconfig: init
+	rm -f .configured
+	[ -f .configured ] || (cd ${PACKAGE}; ./configure ${CONFIG_OPTIONS})
+	echo "yes" > .configured
+
+build: config
+	$(call build_package,${PACKAGE})
+
+install: build
+	$(call install_package,${PACKAGE})
 
 clean:
-	$(call clean_package,${APP}${VERSION})
+	$(call clean_package,${PACKAGE})
 
-distclean: clean
-	$(call distclean_package,${APP}${VERSION})
+distclean: 
+	$(call distclean_package,${PACKAGE})

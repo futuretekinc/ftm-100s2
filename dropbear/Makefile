@@ -1,22 +1,10 @@
 include ../Makefile.in
 
 APP=dropbear
+PROGRAM=dropbear
 VERSION=-2015.68
-
-CONFIGDIR=/etc/config
-INITDDIR=/etc/init.d
-RCDDIR=/etc/rc.d
-BUILD_OPTIONS=STATIC=1 SCPPROGRESS=0 PROGRAMS="dropbear dropbearkey scp dbclient"
-
-all: configure build install
-
-check:
-	$(call check_package,${APP}${VERSION})
-
-configure: check
-	if [ ! -f .configured ]; then \
-		(cd ${APP}${VERSION};\
-		./configure --host=${HOST} \
+PACKAGE=${PROGRAM}${VERSION}
+CONFIG_OPTIONS= --host=${HOST} \
 			--disable-zlib \
 			--disable-largefile \
 			--disable-loginfunc \
@@ -29,25 +17,48 @@ configure: check
 			--disable-pututxline \
 			--disable-lastlog \
 			--prefix=${PREFIX} \
-			CC=${CC});\
-		echo "yes" > .configured;\
-	fi;
+			CC=${CC}
+BUILD_OPTIONS=STATIC=1 SCPPROGRESS=0 PROGRAMS="dropbear dropbearkey scp dbclient"
 
-build: configure
-	$(call build_package,${APP}${VERSION})
+START := $(shell ${CURDIR}/../tools/search_code config/initd_${APP} "START")
+STOP  := $(shell ${CURDIR}/../tools/search_code config/initd_${APP} "STOP")
+
+all: build 
+
+init:
+	$(call init_package,${PACKAGE})
+
+reinit:
+	$(call reinit_package,${PACKAGE})
+	
+config: init
+	[ -f .configured ] || (cd ${PACKAGE};./configure ${CONFIG_OPTIONS})
+	echo "yes" > .configured
+
+reconfig:
+	rm -f .configured
+	(cd ${PACKAGE};./configure ${CONFIG_OPTIONS})
+	echo "yes" > .configured
+
+build: config
+	$(call build_package,${PACKAGE})
 
 install:
-	make -C ${APP}${VERSION} install DESTDIR=${DESTDIR}
+	make -C ${PACKAGE} install DESTDIR=${DESTDIR}
 	[ -d ${DESTDIR}${CONFIGDIR} ] || mkdir -p ${DESTDIR}${CONFIGDIR}
 	install -m 644 config/config_dropbear ${DESTDIR}${CONFIGDIR}/${APP}
 	[ -d ${DESTDIR}${INITDDIR} ] || mkdir -p ${DESTDIR}${INITDDIR}
 	install -m 755 config/initd_dropbear ${DESTDIR}${INITDDIR}/${APP}
 	[ -d ${DESTDIR}${RCDDIR} ] || mkdir -p ${DESTDIR}${RCDDIR}
-	cd ${DESTDIR}${RCDDIR}; ln -sf ${INITDDIR}/${APP} S50${APP};ln -sf ${INITDDIR}/${APP} K50${APP};
-
+ifneq ($(START),)
+	(cd ${DESTDIR}${RCDDIR}; ln -sf ${INITDDIR}/${APP} S${START}${APP})
+endif
+ifneq ($(STOP),)
+	(cd ${DESTDIR}${RCDDIR}; ln -sf ${INITDDIR}/${APP} K${STOP}${APP})
+endif
 
 clean:
-	$(call clean_package,${APP}${VERSION})
+	$(call clean_package,${PACKAGE})
 
-distclean: clean
-	$(call distclean_package,${APP}${VERSION})
+distclean: 
+	$(call distclean_package,${PACKAGE})

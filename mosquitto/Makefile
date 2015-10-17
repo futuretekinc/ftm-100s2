@@ -2,9 +2,12 @@ include ../Makefile.in
 
 
 APP=mosquitto
+PROGRAM=mosquitto
 VERSION=-1.4.4
-export CFLAGS=-I${CURDIR}/../openssl/_install/usr/include
-export LDFLAGS=-L${CURDIR}/../openssl/_install/usr/lib -lcrypto -lssl
+PACKAGE=${PROGRAM}${VERSION}
+
+CFLAGS=-I${CURDIR}/../openssl/_install/usr/include
+LDFLAGS=-L${CURDIR}/../openssl/_install/usr/lib -lcrypto -lssl
 BUILD_OPTIONS=	WITH_TLS=no \
 		WITH_SRV=no \
 		WITH_UUID=no \
@@ -13,21 +16,26 @@ BUILD_OPTIONS=	WITH_TLS=no \
 		LDFLAGS=${LDFLAGS} 
 INSTALL_OPTIONS=DESTDIR=${DESTDIR}
 
-all: configure build install
+all: build
 
-check:
-	$(call check_package,${APP}${VERSION})
+init:
+	$(call init_package,${PACKAGE})
 
-configure: check
+reinit:
+	$(call reinit_package,${PACKAGE})
 
-build: configure 
-	$(call build_package,${APP}${VERSION})
+config: init
+
+reconfig: ;
+
+build: config
+	$(call build_package,${PACKAGE})
 
 install:
-	$(call install_package,${APP}${VERSION})
+	$(call install_package,${PACKAGE})
 
 clean:
-	$(call clean_package,${APP}${VERSION})
+	$(call clean_package,${PACKAGE})
 
 distclean: clean
-	$(call distclean_package,${APP}${VERSION})
+	$(call distclean_package,${PACKAGE})

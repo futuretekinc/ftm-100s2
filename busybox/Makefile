@@ -1,18 +1,32 @@
 include ../Makefile.in
 
 APP=busybox
+PROGRAM=${APP}
 VERSION=-1.23.2
+PACKAGE=${PROGRAM}${VERSION}
 
-all: configure build install
+all: build
 
-check:
-	$(call check_package,${APP}${VERSION})
+init:
+	$(call init_package,${PACKAGE})
 
-configure: check
-	cp config/config.ftm-100s2 ${APP}${VERSION}/.config
-	make -C ${APP}${VERSION} oldconfig
+reinit:
+	$(call reinit_package,${PACKAGE})
 
-build: configure
+config: init
+	if [ ! -f .configured ] ; then \
+		awk -v destdir=${DESTDIR} '{ if ($$1 ~ /CONFIG_PREFIX/) {split($$1,vals,"="); printf "%s=\"%s\"\n", vals[1], destdir} else {print $$0} }' ${CURDIR}/config/config.ftm-100s2 > ${PACKAGE}/.config; \
+		make -C ${PACKAGE} oldconfig;\
+	fi
+	echo "yes" > .configured
+
+reconfig: 
+	rm -f .configured
+	[ -f .configured ] || (cp config/config.ftm-100s2 ${PACKAGE}/.config; make -C ${PACKAGE} oldconfig)
+	echo "yes" > .configured
+
+
+build: config
 	$(call build_package,${APP}${VERSION})
 
 install:
@@ -24,5 +38,5 @@ install:
 clean:
 	$(call clean_package,${APP}${VERSION})
 
-distclean: clean
+distclean: 
 	$(call distclean_package,${APP}${VERSION})

@@ -1,22 +1,63 @@
 TARGET=ftm-100s
+
 ROOT=${CURDIR}/_root
-COMMON_APPS=base busybox openssl iptables zlib openssh libpcap tcpdump lua libubox uci gmp strongswan hotplug2 ntpclient dropbear pcre lighttpd qdecoder webadmin net-snmp mosquitto node tpgw 
+LIBS=gmp pcre libubox zlib qdecoder libpcap
+APPS=base network busybox openssl iptables openssh tcpdump lua uci strongswan hotplug2 ntpclient dropbear lighttpd webadmin net-snmp mosquitto node tpgw 
 
 include Makefile.in
 
-all: build
+all: install_apps
 	
+phase1: build_libs
 
-configure: 
-	for app in $(COMMON_APPS); do \
-		make -C $$app configure; \
+config_libs: 
+	for app in $(LIBS); do \
+		make -C $$app config; \
+	done
+
+config_apps: install_libs
+	for app in $(APPS); do \
+		make -C $$app config; \
 	done
 	
-build:  configure
-	for app in $(COMMON_APPS); do \
+build_libs:  config_libs
+	for app in $(LIBS); do \
 		make -C $$app; \
 	done
 
+build_apps:  config_apps
+	for app in $(APPS); do \
+		make -C $$app; \
+	done
+
+install_libs:
+	if [ -d ${ROOT} ]; then \
+		rm -rf ${ROOT}\* ;\
+	else \
+		mkdir -p ${ROOT} ;\
+	fi
+
+	for app in $(LIBS); do \
+		make -C $$app install DESTDIR=${ROOT}; \
+	done
+
+install_apps: build_apps
+	if [ -d ${ROOT} ]; then \
+		rm -rf ${ROOT}\* ;\
+	else \
+		mkdir -p ${ROOT} ;\
+	fi
+
+	for app in $(APPS); do \
+		make -C $$app install DESTDIR=${ROOT}; \
+	done
+	tools/make_image ${ROOT} rootfs.img
+
+	if [ -d ${ROOT} ]; then \
+		rm -rf ${ROOT} ;\
+	fi
+
+	
 target: 
 	if [ -d ${ROOT} ]; then \
 		rm -rf ${ROOT}\* ;\
@@ -24,7 +65,7 @@ target:
 		mkdir -p ${ROOT} ;\
 	fi
 
-	for app in $(COMMON_APPS); do \
+	for app in $(APPS); do \
 		cp -r $$app/_install/*  ${ROOT}/; \
 	done
 	tools/make_image ${ROOT} rootfs.img
@@ -34,12 +75,12 @@ target:
 	fi
 
 clean:
-	for app in $(COMMON_APPS); do \
+	for app in $(LIBS) $(APPS); do \
 		make -C $$app clean; \
 	done
 
 distclean:
-	for app in $(COMMON_APPS); do \
+	for app in $(LIBS) $(APPS); do \
 		make -C $$app distclean; \
 	done
 

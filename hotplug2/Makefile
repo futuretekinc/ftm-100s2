@@ -1,27 +1,31 @@
 include ../Makefile.in
 
 APP=hotplug2
+PROGRAM=hotplug2
 VERSION=-1.0
+PACKAGE=${PROGRAM}${VERSION}
 
 INSTALL_OPTIONS=DESTDIR=${DESTDIR}
 
-all: configure build install
+all: build
 
-check:
-	$(call check_package,${APP}${VERSION})
+init:
+	$(call init_package,${PACKAGE})
 
+reinit:
+	$(call reinit_package,${PACKAGE})
 
-configure: check
+config: init
 
-build: configure 
-	$(call build_package,${APP}${VERSION})
+build: config
+	$(call build_package,${PACKAGE})
 
 install:
-	$(call install_package,${APP}${VERSION})
+	$(call install_package,${PACKAGE})
 	cp -r config/* ${DESTDIR}/
 
 clean:
-	$(call clean_package,${APP}${VERSION})
+	$(call clean_package,${PACKAGE})
 
-distclean: clean
-	$(call distclean_package,${APP}${VERSION})
+distclean: 
+	$(call distclean_package,${PACKAGE})

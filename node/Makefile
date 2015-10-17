@@ -1,22 +1,28 @@
 include ../Makefile.in
 
 APP=node
+PROGRAM=${APP}
 VERSION=-0.10.28
+PACKAGE=${PROGRAM}${APP}
 
-all: configure build install
+all: build 
 
-check:
-	$(call check_package,${APP}${VERSION})
+init: ;
 
-configure: check
+reinit: ;
 
-build: configure 
+config: ;
+
+reconfig: ;
+
+build: ;
 
 install:
 	[ -d ${DESTDIR}/usr ] || mkdir -p ${DESTDIR}/usr
-	cp -r ${APP}${VERSION}/* ${DESTDIR}/usr/
+	cp -r ${PACKAGE}/* ${DESTDIR}/usr/
 
-clean: ;
+clean:
+	$(call clean_package, ${PACKAGE})
 
-distclean: clean
-	$(call distclean_package,${APP}${VERSION})
+distclean: 
+	$(call distclean_package, ${PACKAGE})

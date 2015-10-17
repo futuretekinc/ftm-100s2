@@ -4,19 +4,7 @@ APP=lighttpd
 VERSION=-1.4.37
 PCREDIR=../pcre
 PCREDESTDIR=${PCREDIR}/_install
-
-all: configure build install
-
-check:
-	$(call check_package,${APP}${VERSION})
-
-configure: check
-	if [ ! -f .configured ] ; then \
-		if [ ! -d ${PCREDESTDIR} ]; then \
-			make -C ${PCREDIR}; \
-		fi; \
-		(cd ${APP}${VERSION};\
-		./configure --host=${HOST} \
+CONFIG_OPTIONS=--host=${HOST} \
 			--prefix=${PREFIX} \
 			--enable-shared \
 			--without-mysql \
@@ -26,19 +14,34 @@ configure: check
 			PCRECONFIG=${CURDIR}/${PCREDESTDIR}/usr/bin/pcre-config \
 			PCRE_LIB=${CURDIR}/${PCREDESTDIR}/usr/lib/libpcre.a \
 			LIBS=-L${CURDIR}/${PCREDESTDIR}/usr/lib \
-			CFLAGS="-DHAVE_PCRE_H=1 -DHAVE_LIBPCRE=1 -I${CURDIR}/${PCREDESTDIR}/usr/include"); \
-		echo "yes" > .configured; \
-	fi;
+			CFLAGS="-DHAVE_PCRE_H=1 -DHAVE_LIBPCRE=1 -I${CURDIR}/${PCREDESTDIR}/usr/include"
 
-build: configure
-	$(call build_package,${APP}${VERSION})
+all: build
+
+init:
+	$(call init_package,${PACKAGE})
+
+reinit:
+	$(call reinit_package,${PACKAGE})
+
+config: init 
+	[ -f .configured ] || (cd ${PACKAGE}; ./configure ${CONFIG_OPTOINS})
+	echo "yes" > .configured; \
+
+reconfig: 
+	rm -f .configured
+	[ -f .configured ] || (cd ${PACKAGE}; ./configure ${CONFIG_OPTOINS})
+	echo "yes" > .configured; \
+
+build: config
+	$(call build_package,${PACKAGE})
 
 install:
-	$(call install_package,${APP}${VERSION})
+	$(call install_package,${PACKAGE})
 	cp -r ${CURDIR}/config/* ${DESTDIR}/
 
 clean:
-	$(call clean_package,${APP}${VERSION})
+	$(call clean_package,${PACKAGE})
 
 distclean: clean
-	$(call distclean_package,${APP}${VERSION})
+	$(call distclean_package,${PACKAGE})

@@ -1,19 +1,11 @@
 include ../Makefile.in
 
 APP=net-snmp
+PROGRAM=${APP}
 VERSION=-5.7.3
-INSTALL_OPTIONS=DESTDIR=${DESTDIR}
+PACKAGE=${PROGRAM}${VERSION}
 
-all: configure build install
-
-check:
-	$(call check_package,${APP}${VERSION})
-
-configure: check
-	if [ ! -f .configured ]; then \
-		(cd ${APP}${VERSION};\
-		./configure \
-			--host=${HOST} \
+CONFIG_OPTIONS= --host=${HOST} \
 			--target=${HOST} \
 			--with-defaults \
 			--with-endianness=little \
@@ -26,18 +18,34 @@ configure: check
 			--with-logfile="/var/log/snmpd.log" \
 			--with-persistent-directory="/var/net-snmp" \
 			--prefix=${PREFIX} \
-			--libdir=${PREFIX}/lib); \
-		echo "yes" > .configured;\
-	fi;
+			--libdir=${PREFIX}/lib
+INSTALL_OPTIONS=DESTDIR=${DESTDIR}
+
+all: build 
+
+init:
+	$(call init_package,${PACKAGE})
+
+reinit:
+	$(call reinit_package,${PACKAGE})
+
+config: init
+	[ -f .configured ] || (cd ${PACKAGE}; ./configure ${CONFIG_OPTIONS})
+	echo "yes" > .configured
 	
-build: configure 
-	$(call build_package,${APP}${VERSION})
+reconfig: 
+	rm -f .configured
+	[ -f .configured ] || (cd ${PACKAGE}; ./configure ${CONFIG_OPTIONS})
+	echo "yes" > .configured
+	
+build: config
+	$(call build_package,${PACKAGE})
 
 install:
-	$(call install_package,${APP}${VERSION})
+	$(call install_package,${PACKAGE})
 
 clean:
-	$(call clean_package,${APP}${VERSION})
+	$(call clean_package,${PACKAGE})
 
 distclean: clean
-	$(call distclean_package,${APP}${VERSION})
+	$(call distclean_package,${PACKAGE})

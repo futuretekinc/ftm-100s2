@@ -1,21 +1,17 @@
 include ../Makefile.in
 
 APP=openssh
+PROGRAM=${APP}
 VERSION=-7.1p1
+PACKAGE=${PROGRAM}${VERSION}
+
 SSLDIR=${CURDIR}/../openssl/_install/usr
 ZLIBDIR=${CURDIR}/../zlib/_install/usr
 CFLAGS="-I${CURDIR}/../openssl/_install/usr/include"
 LDFLAGS="-L${CURDIR}/../openssl/_install/usr/lib"
 LD=${CC}
-all: configure build install
 
-check:
-	$(call check_package,${APP}${VERSION})
-
-configure: check
-	if [ ! -f .configured ] ; then \
-		(cd ${APP}${VERSION}; \
-		./configure --host=${HOST} \
+CONFIG_OPTOINS=--host=${HOST} \
 			--with-libs \
 			--with-zlib=${ZLIBDIR} \
 			--with-ssl-dir=${SSLDIR} \
@@ -24,18 +20,33 @@ configure: check
 			--without-stackprotect \
 			CFLAGS=${CFLAGS} \
 			LDFLAGS=${LDFLAGS} \
-			LD=${CC}); \
-		echo "yes" > .configured ;\
-	fi; 
+			LD=${CC}
+
+all: build
+
+init:
+	$(call init_package,${PACKAGE})
+
+reinit:
+	$(call reinit_package,${PACKAGE})
+
+config: init
+	[ -f .configured ] || (cd ${PACKAGE}; ./configure ${CONFIG_OPTIONS})
+	echo "yes" > .configured
+
+reconfig:
+	rm -f .configured
+	[ -f .configured ] || (cd ${PACKAGE}; ./configure ${CONFIG_OPTIONS})
+	echo "yes" > .configured 
 
 build:
-	$(call build_package,${APP}${VERSION})
+	$(call build_package,${PACKAGE})
 
 install:
-	make -C ${APP}${VERSION} install-files DESTDIR=${DESTDIR} STRIP_OPT="--strip-program=${STRIP}"
+	make -C ${PACKAGE} install-files DESTDIR=${DESTDIR} STRIP_OPT="--strip-program=${STRIP}"
 
 clean:
-	$(call clean_package,${APP}${VERSION})
+	$(call clean_package,${PACKAGE})
 
-distclean: clean
-	$(call distclean_package,${APP}${VERSION})
+distclean: c
+	$(call distclean_package,${PACKAGE})

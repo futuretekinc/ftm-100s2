@@ -1,31 +1,40 @@
 include ../Makefile.in
 
+APP=openssl
+PROGRAM=${APP}
+VERSION=-1.0.2d
+PACKAGE=${PROGRAM}${VERSION}
+
+CONFIG_OPTIONS= --prefix=${PREFIX} shared linux-cortina
 BUILD_OPTIONS=AR="${AR} r"
 INSTALL_OPTIONS=INSTALL_PREFIX=${DESTDIR}
 
-APP=openssl
-VERSION=-1.0.2d
 
-all: configure build install
+all: build
 
-check:
-	$(call check_package,${APP}${VERSION})
+init:
+	$(call init_package,${PACKAGE})
 
-configure: check
-	if [ ! -f .configured ] ; then \
-		(cd ${APP}${VERSION}; ./Configure \
-		--prefix=${PREFIX} shared linux-cortina); \
-		echo "yes" > .configured; \
-	fi
+reinit:
+	$(call reinit_package,${PACKAGE})
 
-build: configure 
-	$(call build_package,${APP}${VERSION})
+config: init
+	[ -f .configured ] || (cd ${PACKAGE}; ./Configure ${CONFIG_OPTIONS})
+	echo "yes" > .configured
+
+reconfig:
+	rm -f .configured
+	[ -f .configured ] || (cd ${PACKAGE}; ./Configure ${CONFIG_OPTIONS})
+	echo "yes" > .configured
+
+build: config
+	$(call build_package,${PACKAGE})
 
 install:
-	$(call install_package,${APP}${VERSION})
+	$(call install_package,${PACKAGE})
 
 clean:
-	$(call clean_package,${APP}${VERSION})
+	$(call clean_package,${PACKAGE})
 
 distclean: clean
-	$(call distclean_package,${APP}${VERSION})
+	$(call distclean_package,${PACKAGE})

@@ -1,24 +1,37 @@
 include ../Makefile.in
 
 APP=zlib
+PROGRAM=${APP}
 VERSION=-1.2.8
+PACKAGE=${PROGRAM}${VERSION}
 
-all: configure build install
+CONFIG_OPTIONS=--prefix=${PREFIX}
 
-check:
-	$(call check_package,${APP}${VERSION})
+all: build
 
-configure: check
-	cd ${APP}${VERSION}; ./configure --prefix=${PREFIX}
+init:
+	$(call init_package,${PACKAGE})
 
-build: configure 
-	$(call build_package,${APP}${VERSION})
+reinit:
+	$(call reinit_package,${PACKAGE})
+
+config: init
+	[ -f .configured ] || (cd ${PACKAGE}; ./configure ${CONFIG_OPTOINS})
+	echo "yes" > .configured
+
+reconfig: init
+	rm -f .configured
+	[ -f .configured ] || (cd ${PACKAGE}; ./configure ${CONFIG_OPTOINS})
+	echo "yes" > .configured
+
+build: config
+	$(call build_package,${PACKAGE})
 
 install: build
-	$(call install_package,${APP}${VERSION})
+	$(call install_package,${PACKAGE})
 
 clean:
-	$(call clean_package,${APP}${VERSION})
+	$(call clean_package,${PACKAGE})
 
-distclean: clean
-	$(call distclean_package,${APP}${VERSION})
+distclean: 
+	$(call distclean_package,${PACKAGE})

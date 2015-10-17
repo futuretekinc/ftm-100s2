@@ -1,17 +1,11 @@
 include ../Makefile.in
 
 APP=tcpdump
+PROGRAM=${APP}
 VERSION=-4.7.4
+PACKAGE=${PROGRAM}${VERSION}
 
-all: configure build install
-
-check:
-	$(call check_package,${APP}${VERSION})
-
-configure: check
-	if [ ! -f .configured ]; then \
-		(cd ${APP}${VERSION}; \
-		./configure --host=${HOST} \
+CONFIG_OPTIONS=--host=${HOST} \
 			--disable-ipv6 \
 			--with-crypto=no\
 			ac_cv_linux_vers=2 \
@@ -19,18 +13,32 @@ configure: check
 			CFLAGS="-I${CURDIR}/../libpcap/_install/usr/include" \
 			LDFLAGS="-L${CURDIR}/../libpcap/_install/usr/lib" \
 			CC=${CC} \
-			AR=${AR} );\
-		echo "yes" > .configured;\
-	fi;
+			AR=${AR} 
+all: build
 
-build: configure 
-	$(call build_package,${APP}${VERSION})
+init:
+	$(call init_package,${PACKAGE})
+
+reinit:
+	$(call reinit_package,${PACKAGE})
+
+config: init
+	[ -f .configured ] || (cd ${PACKAGE}; ./configure ${CONFIG_OPTIONS})
+	echo "yes" > .configured
+
+reconfig: init
+	rm -f .configured
+	[ -f .configured ] || (cd ${PACKAGE}; ./configure ${CONFIG_OPTIONS})
+	echo "yes" > .configured
+
+build: config
+	$(call build_package,${PACKAGE})
 
 install:
-	$(call install_package,${APP}${VERSION})
+	$(call install_package,${PACKAGE})
 
 clean:
-	$(call clean_package,${APP}${VERSION})
+	$(call clean_package,${PACKAGE})
 
-distclean: clean
-	$(call distclean_package,${APP}${VERSION})
+distclean: 
+	$(call distclean_package,${PACKAGE})

@@ -1,30 +1,50 @@
 include ../Makefile.in
 
-APP=iptables
+APP=firewall
+PROGRAM=iptables
 VERSION=-1.4.21
+PACKAGE=${PROGRAM}${VERSION}
+CONFIG_OPTIONS=--host=${HOST} --prefix=${PREFIX} -disable-ipv6 CC=${CC}
 
-all: configure build install
+START := $(shell ${CURDIR}/../tools/search_code config/initd_${APP} "START")
+STOP  := $(shell ${CURDIR}/../tools/search_code config/initd_${APP} "STOP")
 
-check:
-	$(call check_package,${APP}${VERSION})
+all: build 
 
-configure: check
-	[ -f .configured ] || cd ${APP}${VERSION};./configure --host=${HOST} --prefix=${PREFIX} --disable-ipv6 CC=${CC}; echo "yes" > .configured
+init:
+	$(call init_package,${PACKAGE})
 
-build: configure 
-	$(call build_package,${APP}${VERSION})
+reinit:
+	$(call reinit_package,${PACKAGE})
+	
+config: init
+	[ -f .configured ] || (cd ${PACKAGE};./configure ${CONFIG_OPTIONS})
+	echo "yes" > .configured
 
-install:
-	$(call install_package,${APP}${VERSION})
-	[ -d ${DESTDIR}/etc/config ] || mkdir -p ${DESTDIR}/etc/config
-	install -m 644 config/config_default_firewall ${DESTDIR}/etc/config/firewall
-	[ -d ${DESTDIR}/etc/init.d ] || mkdir -p ${DESTDIR}/etc/init.d
-	install -m 755 config/initd_firewall ${DESTDIR}/etc/init.d/firewall
-	[ -d ${DESTDIR}/etc/rc.d ] || mkdir -p ${DESTDIR}/etc/rc.d
-	(cd ${DESTDIR}/etc/rc.d; ln -s ../init.d/firewall S45firewall)
+reconfig:
+	rm -f .configured
+	(cd ${PACKAGE};./configure ${CONFIG_OPTIONS})
+	echo "yes" > .configured
+
+build: config
+	$(call build_package,${PACKAGE})
+
+install: build
+	$(call install_package,${PACKAGE})
+	[ -d ${DESTDIR}${CONFIGDIR} ] || mkdir -p ${DESTDIR}${CONFIGDIR}
+	install -m 644 config/config_${APP} ${DESTDIR}${CONFIGDIR}/${APP}
+	[ -d ${DESTDIR}${INITDDIR} ] || mkdir -p ${DESTDIR}${INITDDIR}
+	install -m 755 config/initd_${APP} ${DESTDIR}${INITDDIR}/${APP}
+	[ -d ${DESTDIR}${RCDDIR} ] || mkdir -p ${DESTDIR}${RCDDIR}
+ifneq ($(START),)
+	(cd ${DESTDIR}${RCDDIR}; ln -sf ${INITDDIR}/${APP} S${START}${APP})
+endif
+ifneq ($(STOP),)
+	(cd ${DESTDIR}${RCDDIR}; ln -sf ${INITDDIR}/${APP} K${STOP}${APP})
+endif
 
 clean:
-	$(call clean_package,${APP}${VERSION})
+	$(call clean_package,${PACKAGE})
 
-distclean: clean
-	$(call distclean_package,${APP}${VERSION})
+distclean: 
+	$(call distclean_package,${PACKAGE})

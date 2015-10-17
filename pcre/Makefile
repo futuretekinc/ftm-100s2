@@ -1,27 +1,36 @@
 include ../Makefile.in
 
 APP=pcre
+PROGRAM=${APP}
 VERSION=-8.37
+PACKAGE=${PROGRAM}${VERSION}
+CONFIG_OPTIONS=--host=${HOST} --prefix=${PREFIX}
 
-all: configure build install
+all: build
 
-check:
-	$(call check_package,${APP}${VERSION})
+init:
+	$(call init_package,${PACKAGE})
+
+reinit:
+	$(call reinit_package,${PACKAGE})
 
 build:
-	$(call build_package,${APP}${VERSION})
+	$(call build_package,${PACKAGE})
 
-configure: check
-	if [ ! -f .configured ] ; then \
-		(cd ${APP}${VERSION}; ./configure --host=${HOST} --prefix=${PREFIX});\
-		echo "yes" > .configured; \
-	fi;
+config: init
+	[ -f .configured ] || (cd ${PACKAGE}; ./configure ${CONFIG_OPTIONS})
+	echo "yes" > .configured
+	
+reconfig: init
+	rm -f .configured
+	[ -f .configured ] || (cd ${PACKAGE}; ./configure ${CONFIG_OPTIONS})
+	echo "yes" > .configured
 	
 install:
-	$(call install_package,${APP}${VERSION})
+	$(call install_package,${PACKAGE})
 
 clean:
-	$(call clean_package,${APP}${VERSION})
+	$(call clean_package,${PACKAGE})
 
-distclean: clean
-	$(call distclean_package,${APP}${VERSION})
+distclean: 
+	$(call distclean_package,${PACKAGE})
