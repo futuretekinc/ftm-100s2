@@ -1,3 +1,5 @@
+export BASE=ftm-100s
+export MODEL=${BASE}-tp
 export HOST=arm-linux
 export CROSS=arm-openwrt-linux-uclibcgnueabi-
 export TARGETMACH=arm-linux

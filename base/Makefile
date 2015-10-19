@@ -1,14 +1,26 @@
 include ../Makefile.in
 
-build:
-	[ -d ${DESTDIR} ] || mkdir -p ${DESTDIR}
-	cp -r common/* ${DESTDIR}/
+APP=base
+PROGRAM=base
+VERSION=-0.1.0
+PACKAGE=${PROGRAM}${VERSION}-${BASE}
+
+init:
+	$(call init_package,${PACKAGE})
+
+reinit:
+	$(call reinit_package,${PACKAGE})
+	
+config: ;
+
+reconfig: ;
+
+build: ;
 
 install:
-	if [ -z ${DESTDIR} ]; then \
-		echo "Destination directory is not defined"; \
-		exit 1;\
-	fi
-
 	[ -d ${DESTDIR} ] || mkdir -p ${DESTDIR}
-	cp -r common/* ${DESTDIR}/
+	cp -r ${PACKAGE}/* ${DESTDIR}/
+
+clean: ;
+
+distclean: ;

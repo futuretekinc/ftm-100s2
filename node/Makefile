@@ -3,7 +3,7 @@ include ../Makefile.in
 APP=node
 PROGRAM=${APP}
 VERSION=-0.10.28
-PACKAGE=${PROGRAM}${APP}
+PACKAGE=${PROGRAM}${VERSION}
 
 all: build 
 
