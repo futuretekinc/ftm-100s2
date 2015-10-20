@@ -21,13 +21,27 @@ reconfig: ;
 build: ;
 
 install: build
-	install -m 755 config/initd_${APP} ${DESTDIR}${INITDDIR}/${APP}
-	[ -d ${DESTDIR}${RCDDIR} ] || mkdir -p ${DESTDIR}${RCDDIR}
+	[ -d ${DESTDIR}/lib/wifi ] || mkdir -p ${DESTDIR}/lib/wifi
+	install -m 755 -t ${DESTDIR}/lib/wifi config/lib/wifi/ar9880.sh
+	install -m 755 -t ${DESTDIR}/lib/wifi config/lib/wifi/hostapd.sh
+	install -m 755 -t ${DESTDIR}/lib/wifi config/lib/wifi/mac80211.sh
+	[ -d ${DESTDIR}/rboot/wfo_atheros_11AC ] || mkdir -p ${DESTDIR}/rboot/wfo_atheros_11AC
+	install -m 644 -t ${DESTDIR}/rboot/wfo_atheros_11AC config/rboot/wfo_atheros_11AC/ar9580_pe1.bin  
+	install -m 644 -t ${DESTDIR}/rboot/wfo_atheros_11AC config/rboot/wfo_atheros_11AC/ar988x_pe0.bin
+	install -m 755 -t ${DESTDIR}/rboot/wfo_atheros_11AC config/rboot/wfo_atheros_11AC/ath_11ac_ap.sh
+	install -m 755 -t ${DESTDIR}/rboot/wfo_atheros_11AC config/rboot/wfo_atheros_11AC/ath_11ac_sta.sh
+	install -m 755 -t ${DESTDIR}/rboot/wfo_atheros_11AC config/rboot/wfo_atheros_11AC/ath_11n_ap.sh
+	install -m 755 -t ${DESTDIR}/rboot/wfo_atheros_11AC config/rboot/wfo_atheros_11AC/ath_dbdc_ap.sh
+	install -m 755 -t ${DESTDIR}/rboot/wfo_atheros_11AC config/rboot/wfo_atheros_11AC/ath_fix_rate.sh
+	install -m 755 -t ${DESTDIR}/rboot/wfo_atheros_11AC config/rboot/wfo_atheros_11AC/get_pci_dev.sh
+	[ -d ${DESTDIR}/etc/init.d ] || mkdir -p ${DESTDIR}/etc/init.d
+	install -m 755 -t ${DESTDIR}/etc/init.d config/etc/init.d/${APP}
+	[ -d ${DESTDIR}/etc/rc.d ] || mkdir -p ${DESTDIR}/etc/rc.d
 ifneq ($(START),)
-	(cd ${DESTDIR}${RCDDIR}; ln -sf ${INITDDIR}/${APP} S${START}${APP})
+	(cd ${DESTDIR}/etc/rc.d; ln -sf ../init.d/${APP} S${START}${APP})
 endif
 ifneq ($(STOP),)
-	(cd ${DESTDIR}${RCDDIR}; ln -sf ${INITDDIR}/${APP} K${STOP}${APP})
+	(cd ${DESTDIR}/etc/rc.d; ln -sf ../init.d/${APP} K${STOP}${APP})
 endif
 
 clean: ;

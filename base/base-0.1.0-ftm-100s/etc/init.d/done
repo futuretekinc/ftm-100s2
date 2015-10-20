@@ -18,19 +18,5 @@ boot() {
 	. /etc/diag.sh
 	set_state done
 
-	CMDLINE=`cat /proc/cmdline`
-	for x in $CMDLINE; do
-	        case $x in
-    	            model=*)
-        	                echo "${x#model=}" > /var/lib/misc/model
-            	    ;;
-
-                	devid=*)
-                    	    echo "${x#devid=}" > /var/lib/misc/sn
-	                ;;
-    	    esac
-	done
-
-
 	echo 1 > /sys/class/leds/sys/brightness
 }

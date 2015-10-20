@@ -51,6 +51,8 @@ start() {
 	
 	# mkdir -p /tmp/var
 	# mount --bind /tmp/var /var
+	[ -d /var ] || mkdir /var
+	mount -t tmpfs /var /var
 
 	mkdir -p /var/run
 	mkdir -p /var/log
@@ -86,8 +88,25 @@ start() {
 #	mount -t yaffs2 /dev/mtdblock5 /opt/
 
 	load_modules /etc/modules.d/*
-        rm -f /overlay/etc/config/version
-        sync
+   	rm -f /overlay/etc/config/version
+    sync
+
+	[ -d /var/lib/misc ] || mkdir -p /var/lib/misc
+
+	CMDLINE=`cat /proc/cmdline`
+	for x in $CMDLINE; do
+	        case $x in
+    	            model=*)
+        	                echo "${x#model=}" > /var/lib/misc/model
+            	    ;;
+
+                	devid=*)
+                    	    echo "${x#devid=}" > /var/lib/misc/sn
+	                ;;
+    	    esac
+	done
+
+
 }
 
 stop() {
