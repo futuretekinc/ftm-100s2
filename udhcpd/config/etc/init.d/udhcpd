@@ -1,0 +1,64 @@
+#!/bin/sh /etc/rc.common
+# (C) 2008 openwrt.org
+
+START=50
+
+CONF_FILE=/tmp/udhcpd.conf
+
+create_conf() {
+	local	interface
+	local	static
+	local	start
+	local	end	
+	local	lease
+	local	router
+	local	subnet
+
+	config_get	interface 	$1	interface	lan
+	config_get  static		$1	static	0
+	config_get	start		$1 	start	
+	config_get	end			$1 	end
+	config_get	lease		$1	lease
+	config_get	router		$1	router
+	config_get	subnet		$1	subnet
+
+	echo "# The interface that udhcpd will use" > $CONF_FILE
+	echo "" >> $CONF_FILE
+	echo "interface $interface" >> $CONF_FILE
+	echo "static    $static" >> $CONF_FILE
+	echo "" >> $CONF_FILE
+	echo "# The start and end of the IP lease block" >> $CONF_FILE
+	echo "start     $start" >> $CONF_FILE
+	echo "end       $end"  >> $CONF_FILE
+	echo "" >> $CONF_FILE
+	echo "# Options" >> $CONF_FILE
+	[ -n $lease ]  && echo "opt lease     $lease" >> $CONF_FILE
+	[ -n $router ] && echo "opt router    $router" >> $CONF_FILE
+	[ -n $subnet ] && echo "opt subnet    $subnet" >> $CONF_FILE
+}
+
+add_dns() {
+	config_get host $1 host
+
+	echo "opt dns $host" >> $CONF_FILE
+}
+
+start() {
+
+	PID=`ps | grep '/usr/sbin/udhcpd' | grep -v 'grep'`
+	[ "$PID" != "" ] && echo "udhcpd is already running."
+
+	config_load udhcpd
+	
+
+	config_foreach create_conf udhcpd
+	config_foreach add_dns dns
+
+	[ ! -f /etc/udhcpd.conf ] && ln -s $CONF_FILE /etc/udhcpd.conf
+
+	/usr/sbin/udhcpd /etc/udhcpd.conf
+}
+
+stop() {
+	pkill udhcpd
+}

@@ -1,0 +1,5 @@
+config wifi wifi0
+	option	ifname	wlan0
+	option	mode	master
+	option  channel 48
+	option  shortgi 0

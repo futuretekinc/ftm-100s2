@@ -5,9 +5,6 @@ PROGRAM=
 VERSION=
 PACKAGE=
 
-START := $(shell ${CURDIR}/../tools/search_code config/initd_${APP} "START")
-STOP  := $(shell ${CURDIR}/../tools/search_code config/initd_${APP} "STOP")
-
 all: build 
 
 init: ;
@@ -34,15 +31,8 @@ install: build
 	install -m 755 -t ${DESTDIR}/rboot/wfo_atheros_11AC config/rboot/wfo_atheros_11AC/ath_dbdc_ap.sh
 	install -m 755 -t ${DESTDIR}/rboot/wfo_atheros_11AC config/rboot/wfo_atheros_11AC/ath_fix_rate.sh
 	install -m 755 -t ${DESTDIR}/rboot/wfo_atheros_11AC config/rboot/wfo_atheros_11AC/get_pci_dev.sh
-	[ -d ${DESTDIR}/etc/init.d ] || mkdir -p ${DESTDIR}/etc/init.d
-	install -m 755 -t ${DESTDIR}/etc/init.d config/etc/init.d/${APP}
-	[ -d ${DESTDIR}/etc/rc.d ] || mkdir -p ${DESTDIR}/etc/rc.d
-ifneq ($(START),)
-	(cd ${DESTDIR}/etc/rc.d; ln -sf ../init.d/${APP} S${START}${APP})
-endif
-ifneq ($(STOP),)
-	(cd ${DESTDIR}/etc/rc.d; ln -sf ../init.d/${APP} K${STOP}${APP})
-endif
+	[ -d ${DESTDIR}/etc/config ] || mkdir -p ${DESTDIR}/etc/config
+	install -m 644 -t ${DESTDIR}/etc/config config/etc/config/${APP}
 
 clean: ;
 

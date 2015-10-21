@@ -1,0 +1,4 @@
+config ap wlan0
+	option vapname  wlan0
+	option essid	"futuretek"
+

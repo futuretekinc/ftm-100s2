@@ -1,8 +1,9 @@
 #!/bin/sh
 SCRIPT_DIR=/lib/cs75xx
 
-PCI=$1
-WFO_MODE_ID=$2
+DEV_ID=$1
+DEV_TYPE=$2
+WFO_MODE_ID=$3
 
 echo "WFO_MODE_ID = $WFO_MODE_ID"
 #if  [ "$WFO_MODE_ID" == "0" ]; then
@@ -23,7 +24,7 @@ if  [ "$WFO_MODE_ID" == "1" ]; then
 	echo 0xf0ff > /proc/driver/cs752x/ne/accel_manager/hw_accel_enable
 	sleep 1
 	$SCRIPT_DIR/set_default_network.sh
-	$SCRIPT_DIR/set_wifi_network.sh $PCI 0		# WiFi-Offload: 0
+	$SCRIPT_DIR/set_wifi_network.sh $DEV_ID $DEV_TYPE 0		# WiFi-Offload: 0
 elif  [ "$WFO_MODE_ID" == "2" ]; then
 	echo "	WFO(Bridge Mode):	Disable"
 	echo "		load original wifi driver"
@@ -41,7 +42,7 @@ elif  [ "$WFO_MODE_ID" == "2" ]; then
         fi
 	sleep 1
 	$SCRIPT_DIR/set_default_network.sh
-	$SCRIPT_DIR/set_wifi_network.sh $PCI 0		# WiFi-Offload: 0
+	$SCRIPT_DIR/set_wifi_network.sh $DEV_ID $DEV_TYPE 0		# WiFi-Offload: 0
 	$SCRIPT_DIR/set_openswan_application.sh
 elif  [ "$WFO_MODE_ID" == "3" ]; then
 	echo "	WFO(Bridge Mode):	Disable"
@@ -54,7 +55,7 @@ elif  [ "$WFO_MODE_ID" == "3" ]; then
 	echo 0x0 > /proc/driver/cs752x/ne/accel_manager/hw_accel_enable
 	sleep 1
 	$SCRIPT_DIR/set_default_network.sh
-	$SCRIPT_DIR/set_wifi_network.sh $PCI 0		# WiFi-Offload: 0
+	$SCRIPT_DIR/set_wifi_network.sh $DEV_ID $DEV_TYPE 0		# WiFi-Offload: 0
 elif  [ "$WFO_MODE_ID" == "4" ]; then
 	echo "	WFO(Bridge Mode):	Disable"
 	echo "		load original wifi driver"
@@ -73,7 +74,7 @@ elif  [ "$WFO_MODE_ID" == "4" ]; then
 	sleep 1
 	$SCRIPT_DIR/set_default_network.sh
 	echo 0 > /proc/driver/cs752x/rt3593/noncacheable_buffer
-	$SCRIPT_DIR/set_wifi_network.sh $PCI 0		# WiFi-Offload: 0
+	$SCRIPT_DIR/set_wifi_network.sh $DEV_ID $DEV_TYPE 0		# WiFi-Offload: 0
 	$SCRIPT_DIR/set_ipsec_network.sh 1	# IPSEC HW Acceleration: 0
 elif [ "$WFO_MODE_ID" == "5" ]; then
 	echo "	WFO(Bridge Mode): 	Disable"
@@ -93,7 +94,7 @@ elif [ "$WFO_MODE_ID" == "5" ]; then
 	sleep 1
 	$SCRIPT_DIR/set_default_network.sh
 	echo 0 > /proc/driver/cs752x/rt3593/noncacheable_buffer
-	$SCRIPT_DIR/set_wifi_network.sh $PCI 0		# WiFi-Offload: 0
+	$SCRIPT_DIR/set_wifi_network.sh $DEV_ID $DEV_TYPE 0		# WiFi-Offload: 0
 	$SCRIPT_DIR/set_ipsec_network.sh 0	# IPSEC HW Acceleration: 0
 elif [ "$WFO_MODE_ID" == "6" ]; then
 	echo "	WFO(Bridge Mode): 	Disable"
@@ -106,7 +107,7 @@ elif [ "$WFO_MODE_ID" == "6" ]; then
 	echo 0x0 > /proc/driver/cs752x/ne/accel_manager/hw_accel_enable
 	sleep 1
 	$SCRIPT_DIR/set_default_network.sh
-	$SCRIPT_DIR/set_wifi_network.sh $PCI 0		# WiFi-Offload: 0
+	$SCRIPT_DIR/set_wifi_network.sh $DEV_ID $DEV_TYPE 0		# WiFi-Offload: 0
 elif [ "$WFO_MODE_ID" == "8" ]; then
 	echo "	WFO(Bridge Mode): 	Enable"
 	echo "		load wfo wifi driver"
@@ -167,7 +168,7 @@ elif [ "$WFO_MODE_ID" == "12" ]; then
         fi
 	sleep 1
 	$SCRIPT_DIR/set_default_network.sh
-	$SCRIPT_DIR/set_wifi_network.sh $PCI 1		# WiFi-Offload: 1
+	$SCRIPT_DIR/set_wifi_network.sh $DEV_ID $DEV_TYPE 1		# WiFi-Offload: 1
 	$SCRIPT_DIR/set_ipsec_network.sh 0	# IPSEC HW Acceleration: 0
 elif [ "$WFO_MODE_ID" == "13" ]; then
 	echo "	WFO(Bridge Mode): 	Enable"
@@ -180,7 +181,7 @@ elif [ "$WFO_MODE_ID" == "13" ]; then
 	echo 0x9024 > /proc/driver/cs752x/ne/accel_manager/hw_accel_enable
 	sleep 1
 	$SCRIPT_DIR/set_default_network.sh
-	$SCRIPT_DIR/set_wifi_network.sh $PCI 1		# WiFi-Offload: 1
+	$SCRIPT_DIR/set_wifi_network.sh $DEV_ID $DEV_TYPE 1		# WiFi-Offload: 1
 	$SCRIPT_DIR/set_pppoe_client.sh
 elif [ "$WFO_MODE_ID" == "14" ]; then
         echo "  WFO(Bridge Mode):       Enable"
@@ -195,7 +196,7 @@ elif [ "$WFO_MODE_ID" == "14" ]; then
         echo 0xf1ff > /proc/driver/cs752x/ne/accel_manager/hw_accel_enable
         sleep 1
 #        $SCRIPT_DIR/set_default_network.sh
-        $SCRIPT_DIR/set_wifi_network.sh $PCI 14               # WiFi-Offload: 1
+        $SCRIPT_DIR/set_wifi_network.sh $DEV_ID $DEV_TYPE 14               # WiFi-Offload: 1
 #        $SCRIPT_DIR/set_ipsec_network.sh 0      # IPSEC HW Acceleration: 1 but PE image is loaded in wifi script
 elif [ "$WFO_MODE_ID" == "16" ]; then
         echo "  WFO(Bridge Mode):       Enable"
@@ -209,7 +210,7 @@ elif [ "$WFO_MODE_ID" == "16" ]; then
         echo 0xf0ff > /proc/driver/cs752x/ne/accel_manager/hw_accel_enable
         sleep 1
         $SCRIPT_DIR/set_default_network.sh
-        $SCRIPT_DIR/set_wifi_network.sh $PCI 16               # WiFi-Offload: 1
+        $SCRIPT_DIR/set_wifi_network.sh $DEV_ID $DEV_TYPE 16               # WiFi-Offload: 1
 elif [ "$WFO_MODE_ID" == "17" ]; then
         echo "  WFO(Bridge Mode):       Enable"
         echo "          load 11ac wfo and 11n A9 wifi"
@@ -223,7 +224,7 @@ elif [ "$WFO_MODE_ID" == "17" ]; then
         echo 0xf1ff > /proc/driver/cs752x/ne/accel_manager/hw_accel_enable
         sleep 1
         $SCRIPT_DIR/set_default_network.sh
-        $SCRIPT_DIR/set_wifi_network.sh $PCI 17               # WiFi-Offload: 1
+        $SCRIPT_DIR/set_wifi_network.sh $DEV_ID $DEV_TYPE 17               # WiFi-Offload: 1
         $SCRIPT_DIR/set_ipsec_network.sh 0      # IPSEC HW Acceleration: 1 but PE image is loaded in wifi script
 
 elif [ "$WFO_MODE_ID" == "-1" ] || ["$WFO_MODE_ID" == "-2" ] ; then
