@@ -3,6 +3,49 @@
 
 START=30
 
+config_ap() {
+	local	MODE
+	local	VAP_NAME
+	local	ESSID
+	local	CHANNEL
+	local	WDS
+	local	SHORTGI
+	local	LDPC
+
+	config_get VAP_NAME $1 vapname
+	config_get ESSID $1 essid
+	config_get WDS $1 wds
+	config_get SHORTGI $1 shortgi
+	config_get LDPC $1 ldpc
+
+	if [ -z $VAP_NAME ] || [ -z $ESSID ] ; then
+		return	1
+	fi
+
+	[ -z $WDS ] && WDS=1
+	[ -z $SHORTGI ] && SHORTGI=1
+	[ -z $LDPC ] && LDPC=1
+	
+	sleep 1
+	iwpriv "$VAP_NAME" wds $WDS 
+	iwconfig "$VAP_NAME" essid $ESSID 
+	iwpriv "$VAP_NAME" shortgi $SHORTGI
+	iwpriv "$VAP_NAME" ldpc $LDPC 
+	ifconfig "$VAP_NAME" up 
+}
+
+disable_ap() {
+	local	VAP_NAME
+
+	config_get VAP_NAME $1 vapname
+
+	if [ -z $VAP_NAME ] ; then
+		return	1
+	fi
+
+	ifconfig "$VAP_NAME" down
+}
+
 start() {
 	. /lib/cs75xx/wifi.sh
 	
@@ -16,7 +59,7 @@ start() {
 			local HTMODE
 			local CHANNEL
 
-			setup_cs_wfo_mode $DEV_TYPE $DEV_ID 1
+			setup_cs_wfo_mode $DEV_TYPE $DEV_ID 1 
 			sleep 2
 			if [ $? -eq 0 ]; then
 				DEV_NAME="wifi$DEV_ID"
@@ -26,19 +69,19 @@ start() {
 				config_get HTMODE $DEV_NAME htmode 11ACVHT80
 				config_get CHANNEL $DEV_NAME channel 48
 
-				if [ -n $IF_NAME ]; then
+				if [ -n $IF_NAME ] && [ -n `cat /proc/net/dev | tail -n+3 | awk '{print $1}' | sed 's/://' | grep $IF_NAME` ]; then
 					case "$MODE" in
 						"master")
-							wlanconfig "$IF_NAME" create wlandev "$DEV_NAME" wlanmode ap
+							wlanconfig "$IF_NAME" create wlandev "$DEV_NAME" wlanmode ap 
 						;;
 						"client")
-							wlanconfig "$IF_NAME" create wlandev "$DEV_NAME" 
+							wlanconfig "$IF_NAME" create wlandev "$DEV_NAME"  
 						;;
 					esac	
 
 				fi
-   				iwpriv "$IF_NAME" mode $HTMODE
-				iwconfig "$IF_NAME" channel $CHANNEL
+   				iwpriv "$IF_NAME" mode $HTMODE 
+				iwconfig "$IF_NAME" channel $CHANNEL 
 			fi
 
 			DEV_ID=`expr $DEV_ID + 1`
@@ -47,10 +90,14 @@ start() {
 
 	echo 1 > /proc/irq/65/smp_affinity
 	echo 2 > /proc/irq/70/smp_affinity
+
+	config_foreach config_ap ap
 }
 
 stop() {
-	none;
+	config_load wifi
+
+	config_foreach diable_ap ap
 }
 
 restart() {

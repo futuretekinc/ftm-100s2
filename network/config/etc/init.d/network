@@ -21,7 +21,7 @@ config_interface() {
 			config_get bridge $1 bridge
 			if [ -n "$bridge" ]; then
 				IS_EXIST_BR=`brctl show | tail -n+2 | awk '{ if ($1 ~ $bridge) print 1  }' | tr -d '[[:space:]]'`
-				if [ -n "$IS_EXIST_BR" ] ; then
+				if [ -z "$IS_EXIST_BR" ] ; then
 					brctl addbr $bridge
 				fi
 		

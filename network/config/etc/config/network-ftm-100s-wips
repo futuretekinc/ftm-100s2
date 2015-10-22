@@ -1,16 +1,16 @@
 # Copyright (C) 2006 OpenWrt.org
 
-config interface 
+config interface lo
         option ifname   lo
         option proto    loopback
 
-config interface 
+config interface eth0
         option ifname   eth0
 		option type		bridge
 		option bridge	wan
         option proto    dhcp
 
-config interface 
+config interface wlan0
 		option ifname	wlan0
 		option type		bridge
 		option bridge	lan

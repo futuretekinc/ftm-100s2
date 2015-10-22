@@ -49,7 +49,7 @@ install_apps: build_apps
 	done
 	tools/make_image ${ROOT} rootfs.img
 
-#	if [ -d ${ROOT} ]; then \
+	if [ -d ${ROOT} ]; then \
 		rm -rf ${ROOT} ;\
 	fi
 
