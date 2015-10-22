@@ -1,19 +1,20 @@
 # Copyright (C) 2006 OpenWrt.org
 
-config interface loopback
+config interface 
         option ifname   lo
-        option proto    static
-        option ipaddr   127.0.0.1
-        option netmask  255.0.0.0
+        option proto    loopback
 
-config interface wan
+config interface 
         option ifname   eth0
+		option type		bridge
+		option bridge	wan
         option proto    dhcp
 
-config interface lan
-		option ifname   wlan0
+config interface 
+		option ifname	wlan0
 		option type		bridge
-		option mode		master
+		option bridge	lan
 		option proto    static
 		option ipaddr   192.168.100.1
 		option netmask  255.255.255.0
+

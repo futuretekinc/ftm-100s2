@@ -49,8 +49,6 @@ start() {
 	config_load system
 	config_foreach system_config system
 	
-	# mkdir -p /tmp/var
-	# mount --bind /tmp/var /var
 	[ -d /var ] || mkdir /var
 	mount -t tmpfs /var /var
 
@@ -73,19 +71,11 @@ start() {
 			--set-rules-file /etc/hotplug2.rules \
 			--max-children 1 >/dev/null 2>&1 &
 
-	# the coldplugging of network interfaces needs to happen later, so we do it manually here
-	for iface in $(awk -F: '/:/ {print $1}' /proc/net/dev); do
-		echo "IFACE : $iface"
-		/usr/bin/env -i ACTION=add INTERFACE="$iface" /sbin/hotplug-call net
-	done
-
 	# create /dev/root if it doesn't exist
 	[ -e /dev/root ] || {
 		rootdev=$(awk 'BEGIN { RS=" "; FS="="; } $1 == "root" { print $2 }' < /proc/cmdline)
 		[ -n "$rootdev" ] && ln -s "$rootdev" /dev/root
 	}
-
-#	mount -t yaffs2 /dev/mtdblock5 /opt/
 
 	load_modules /etc/modules.d/*
    	rm -f /overlay/etc/config/version

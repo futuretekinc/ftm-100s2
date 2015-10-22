@@ -1,95 +1,77 @@
 #!/bin/sh /etc/rc.common
-# Copyright (C) 2006 OpenWrt.org
 
 START=40
 STOP=90
 
-config_wifi_interface() {                                                                                                                                                                                                                         local   IF_NAME                                                                                                                                                                                                                      
-	config_get IF_NAME $1 ifname                                                                                                                                                                                                         
+config_interface() {
+	local 	ifname
+	local	iftype
+	local	proto
+	local	ipaddr
+	local	netmask
+	local	bridge
 
-	IS_WLAN=`echo $IF_NAME | grep wlan`                                                                                                                                                                                                  
-	if [ -n $IS_WLAN ]; then                                                                                                                                                                                                             
-		local   IPADDR                                                                                                                                                                                                               
-		local   NETMASK                                                                                                                                                                                                              
+	config_get ifname $1 'ifname'
+	[ -z "$ifname" ] && return 0
 
-		config_get IPADDR $1 ipaddr                                                                                                                                                                                                  
-		config_get NETMASK $1 netmask                                                                                                                                                                                                
+	config_get iftype $1 'type' "none"
 
-		if [ -z $IPADDR ] || [ -z $NETMASK ]; then                                                                                                                                                                                   
-			return  1                                                                                                                                                                                                            
-		fi                                                                                                                                                                                                                           
-
-		ifconfig $IF_NAME $IPADDR netmask $NETMASK                                                                                                                                                                                   
-	fi                                                                                                                                                                                                                                   
-}                                                                                                                                                                                                                                            
-setup_switch() { 
-	return 0; 
-}
-	
-setup_wifi() {
-	if [ -f /etc/config/wifi ]; then
-		. /lib/cs75xx/wifi.sh
-	
-		config_load wifi
-	
-		DEV_ID=0
-		for DEV_TYPE in `get_pci_dev.sh`; do
-			if [ $DEV_TYPE -ge 0 ]; then
-				local IF_NAME
-				local DEV_NAME
-				local HTMODE
-				local CHANNEL
-
-				setup_cs_wfo_mode $DEV_TYPE $DEV_ID 1
-				sleep 2
-				if [ $? -eq 0 ]; then
-					DEV_NAME="wifi$DEV_ID"
-	
-					config_get IF_NAME $DEV_NAME ifname
-					config_get MODE $DEV_NAME mode master
-					config_get HTMODE $DEV_NAME htmode 11ACVHT80
-					config_get CHANNEL $DEV_NAME channel 48
-
-					if [ -n $IF_NAME ]; then
-						case "$MODE" in
-							"master")
-								wlanconfig "$IF_NAME" create wlandev "$DEV_NAME" wlanmode ap
-							;;
-							"client")
-								wlanconfig "$IF_NAME" create wlandev "$DEV_NAME" 
-							;;
-						esac	
-
-					fi
-    				iwpriv "$IF_NAME" mode $HTMODE
-					iwconfig "$IF_NAME" channel $CHANNEL
+	case "$iftype" in
+		"bridge")
+			config_get bridge $1 bridge
+			if [ -n "$bridge" ]; then
+				IS_EXIST_BR=`brctl show | tail -n+2 | awk '{ if ($1 ~ $bridge) print 1  }' | tr -d '[[:space:]]'`
+				if [ -n "$IS_EXIST_BR" ] ; then
+					brctl addbr $bridge
 				fi
-	
-				DEV_ID=`expr $DEV_ID + 1`
+		
+				brctl addif $bridge $ifname 2> /dev/null
+				ifconfig $ifname up
+				ifconfig $bridge up
 			fi
-		done
-	
-		echo 1 > /proc/irq/65/smp_affinity
-		echo 2 > /proc/irq/70/smp_affinity
-	fi
-	return	0;
-}
+			ifname=$bridge	
+			;;
 
+		"loopback")
+			ifconfig $ifname loopback
+			;;
+
+	esac
+
+	config_get proto  $1 proto 
+	case "$proto" in
+		"static")
+			config_get ipaddr $1 ipaddr
+			config_get netmask $1 netmask
+			if [ -n "$ipaddr" ] && [ -n "$netmask" ]; then
+				ifconfig $ifname $ipaddr netmask $netmask	
+			fi
+			;;
+		"dhcp")
+			if [ -f /var/run/udhcpc.$ifname.pid ]; then
+				cat /var/run/udhcpc.$ifname.pid | xargs kill 2> /dev/null
+			fi
+			udhcpc -t 0 -i $bridge -R -n -p /var/run/udhcpc.$ifname
+			;;
+	esac
+}
 
 start() {
-	include /lib/network
-
-	setup_switch
-	setup_wifi
-
 	config_load network
-	config_foreach config_wifi_interface interface
+
+	config_foreach config_interface interface
 }
 
 stop() {
-	ifdown -a
+	for ifname in `cat /proc/net/dev | tail -n+3 | awk '{print $1}' | sed 's/://'`; do
+		if [ -f /var/run/udhcpc.$ifname.pid ]; then
+			cat /var/run/udhcpc.$ifname.pid | xargs kill 2> /dev/null
+		fi
+		ifconfig "$ifname" 0.0.0.0 down 2> /dev/null
+	done
 }
 
 restart() {
+	stop
 	start
 }

@@ -1,20 +1,23 @@
-config interface loopback
+config interface 
         option ifname   lo
-        option proto    static
-        option ipaddr   127.0.0.1
-        option netmask  255.0.0.0
+        option proto  	loopback 
 
-config interface lan
-        option ifname   eth2
+config interface 
+        option ifname   usb0
         option type     bridge
+		option bridge	wan
+        option proto    dhcp
+
+config interface 
+        option ifname   eth0
+        option type     bridge
+		option bridge	lan
         option proto    static
         option ipaddr   192.168.1.1
         option netmask  255.255.255.0
 
-config interface wan
-        option ifname   eth0
-        option proto    dhcp
+config interface 
+        option ifname   eth2
+        option type     bridge
+		option bridge	lan
 
-config interface wwan
-        option ifname   usb0
-        option proto    dhcp
