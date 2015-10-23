@@ -10,8 +10,8 @@ CONFIG_OPTIONS=--host=${HOST} \
 			--with-crypto=no\
 			ac_cv_linux_vers=2 \
 			--prefix=${PREFIX} \
-			CFLAGS="-I${CURDIR}/../libpcap/_install/usr/include" \
-			LDFLAGS="-L${CURDIR}/../libpcap/_install/usr/lib" \
+			CFLAGS="-I${BUILDDIR}/libpcap/_install/usr/include" \
+			LDFLAGS="-L${BUILDDIR}/libpcap/_install/usr/lib" \
 			CC=${CC} \
 			AR=${AR} 
 all: build

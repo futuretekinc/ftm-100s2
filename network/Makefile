@@ -5,8 +5,8 @@ PROGRAM=
 VERSION=
 PACKAGE=
 
-START := $(shell ${CURDIR}/../tools/search_code config/etc/init.d/${APP} "START")
-STOP  := $(shell ${CURDIR}/../tools/search_code config/etc/init.d/${APP} "STOP")
+START := $(shell ${TOOLSDIR}/search_code config/etc/init.d/${APP} "START")
+STOP  := $(shell ${TOOLSDIR}/search_code config/etc/init.d/${APP} "STOP")
 
 all: ;
 

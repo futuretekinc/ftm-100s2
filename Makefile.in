@@ -13,7 +13,6 @@ export AS=${CROSS}as
 export STRIP=${CROSS}strip
 export RANLIB=${CORSS}ranlib
 export PREFIX=/usr
-export DESTDIR=${CURDIR}/_install
 
 CONFIGDIR=/etc/config
 INITDDIR=/etc/init.d
@@ -50,8 +49,8 @@ apps-$(CONFIG_WIRELESS_TOOLS) += wireless_tools
 apps-$(CONFIG_WIFI) += wifi
 apps-$(CONFIG_AP) += ap
 
-LIBS=libs-y
-APPS=apps-y
+LIBS=$(libs-y)
+APPS=$(apps-y)
 
 define init_package
 	$(eval FILE_NAME := $1)

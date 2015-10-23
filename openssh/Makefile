@@ -5,10 +5,10 @@ PROGRAM=${APP}
 VERSION=-7.1p1
 PACKAGE=${PROGRAM}${VERSION}
 
-SSLDIR=${CURDIR}/../openssl/_install/usr
-ZLIBDIR=${CURDIR}/../zlib/_install/usr
-CFLAGS="-I${CURDIR}/../openssl/_install/usr/include"
-LDFLAGS="-L${CURDIR}/../openssl/_install/usr/lib"
+SSLDIR=${BUILDDIR}/openssl/_install/usr
+ZLIBDIR=${BUILDDIR}/zlib/_install/usr
+CFLAGS="-I${BUILDDIR}/openssl/_install/usr/include"
+LDFLAGS="-L${BUILDDIR}/openssl/_install/usr/lib"
 LD=${CC}
 
 CONFIG_OPTOINS=--host=${HOST} \

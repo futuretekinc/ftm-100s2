@@ -6,8 +6,8 @@ VERSION=-1.4.21
 PACKAGE=${PROGRAM}${VERSION}
 CONFIG_OPTIONS=--host=${HOST} --prefix=${PREFIX} -disable-ipv6 CC=${CC}
 
-START := $(shell ${CURDIR}/../tools/search_code config/initd_${APP} "START")
-STOP  := $(shell ${CURDIR}/../tools/search_code config/initd_${APP} "STOP")
+START := $(shell ${TOOLSDIR}/search_code config/initd_${APP} "START")
+STOP  := $(shell ${TOOLSDIR}/search_code config/initd_${APP} "STOP")
 
 all: build 
 
@@ -32,9 +32,9 @@ build: config
 install: build
 	$(call install_package,${PACKAGE})
 	[ -d ${DESTDIR}${CONFIGDIR} ] || mkdir -p ${DESTDIR}${CONFIGDIR}
-	install -m 644 config/config_${APP} ${DESTDIR}${CONFIGDIR}/${APP}
+	install -m 644 config/etc/config/${APP} ${DESTDIR}${CONFIGDIR}/${APP}
 	[ -d ${DESTDIR}${INITDDIR} ] || mkdir -p ${DESTDIR}${INITDDIR}
-	install -m 755 config/initd_${APP} ${DESTDIR}${INITDDIR}/${APP}
+	install -m 755 config/etc/init.d/${APP} ${DESTDIR}${INITDDIR}/${APP}
 	[ -d ${DESTDIR}${RCDDIR} ] || mkdir -p ${DESTDIR}${RCDDIR}
 ifneq ($(START),)
 	(cd ${DESTDIR}${RCDDIR}; ln -sf ${INITDDIR}/${APP} S${START}${APP})

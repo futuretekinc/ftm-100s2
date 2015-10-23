@@ -15,7 +15,8 @@ reinit:
 
 config: init
 	if [ ! -f .configured ] ; then \
-		awk -v destdir=${DESTDIR} '{ if ($$1 ~ /CONFIG_PREFIX/) {split($$1,vals,"="); printf "%s=\"%s\"\n", vals[1], destdir} else {print $$0} }' ${CURDIR}/config/config.${PLATFORM} > ${PACKAGE}/.config; \
+		awk -v destdir=${DESTDIR} '{ if ($$1 ~ /CONFIG_PREFIX/) {split($$1,vals,"="); printf "%s=\"%s\"\n", vals[1], destdir} else {print $$0} }' \
+				${CURDIR}/config/config.${PLATFORM} > ${PACKAGE}/.config; \
 		make -C ${PACKAGE} oldconfig;\
 	fi
 	echo "yes" > .configured

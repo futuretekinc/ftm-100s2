@@ -5,7 +5,7 @@ PROGRAM=${APP}
 VERSION=-5.3.3
 PACKAGE=${PROGRAM}${VERSION}
 
-GMPDIR=${CURDIR}/../gmp/_install/usr
+GMPDIR=${BUILDDIR}/gmp/_install/usr
 CONFIG_OPTIONS=--host=${HOST} \
 			--prefix=${PREFIX} \
 			--sysconfdir=/etc \

@@ -1,50 +1,51 @@
-export ROOT=${CURDIR}/_root
 export TOPDIR=${CURDIR}
+export BUILDDIR=${TOPDIR}
+export PACKAGEDIR=${TOPDIR}/packages
+export TOOLSDIR=${TOPDIR}/tools
+export DESTDIR=${TOPDIR}/_root
 
 include Makefile.in
 
 all: install_apps
 	
-phase1: build_libs
-
 config_libs: 
 	for app in $(LIBS); do \
-		make -C $$app config; \
+		make -C ${BUILDDIR}/$$app config DESTDIR=${DESTDIR}; \
 	done
 
 config_apps: install_libs
 	for app in $(APPS); do \
-		make -C $$app config DESTDIR=${ROOT}; \
+		make -C ${BUILDDIR}/$$app config DESTDIR=${DESTDIR}; \
 	done
 	
 build_libs:  config_libs
 	for app in $(LIBS); do \
-		make -C $$app; \
+		make -C ${BUILDDIR}/$$app; \
 	done
 
 build_apps:  config_apps
 	for app in $(APPS); do \
-		make -C $$app; \
+		make -C ${BUILDDIR}/$$app; \
 	done
 
-install_libs:
-	if [ -d ${ROOT} ]; then \
-		rm -rf ${ROOT}\* ;\
+install_libs: build_libs
+	if [ -d ${DESTDIR} ]; then \
+		rm -rf ${DESTDIR}\* ;\
 	else \
-		mkdir -p ${ROOT} ;\
+		mkdir -p ${DESTDIR} ;\
 	fi
 	for app in $(LIBS); do \
-		make -C $$app install DESTDIR=${ROOT}; \
+		make -C ${BUILDDIR}/$$app install DESTDIR=${DESTDIR}; \
 	done
 
 install_apps: build_apps
-	if [ -d ${ROOT} ]; then \
-		rm -rf ${ROOT}\* ;\
+	if [ -d ${DESTDIR} ]; then \
+		rm -rf ${DESTDIR}\* ;\
 	else \
-		mkdir -p ${ROOT} ;\
+		mkdir -p ${DESTDIR} ;\
 	fi
 	for app in $(APPS); do \
-		make -C $$app install DESTDIR=${ROOT}; \
+		make -C ${BUILDDIR}/$$app install DESTDIR=${DESTDIR}; \
 	done
 	tools/make_image ${ROOT} rootfs.img
 
@@ -54,11 +55,11 @@ install_apps: build_apps
 
 clean:
 	for app in $(LIBS) $(APPS); do \
-		make -C $$app clean; \
+		make -C ${BUILDDIR}/$$app clean; \
 	done
 
 distclean:
 	for app in $(LIBS) $(APPS); do \
-		make -C $$app distclean; \
+		make -C ${BUILDDIR}/$$app distclean; \
 	done
 

@@ -20,8 +20,8 @@ CONFIG_OPTIONS= --host=${HOST} \
 			CC=${CC}
 BUILD_OPTIONS=STATIC=1 SCPPROGRESS=0 PROGRAMS="dropbear dropbearkey scp dbclient"
 
-START := $(shell ${CURDIR}/../tools/search_code config/initd_${APP} "START")
-STOP  := $(shell ${CURDIR}/../tools/search_code config/initd_${APP} "STOP")
+START := $(shell ${TOOLSDIR}/search_code config/initd_${APP} "START")
+STOP  := $(shell ${TOOLSDIR}/search_code config/initd_${APP} "STOP")
 
 all: build 
 
@@ -46,9 +46,9 @@ build: config
 install:
 	make -C ${PACKAGE} install DESTDIR=${DESTDIR}
 	[ -d ${DESTDIR}${CONFIGDIR} ] || mkdir -p ${DESTDIR}${CONFIGDIR}
-	install -m 644 config/config_dropbear ${DESTDIR}${CONFIGDIR}/${APP}
+	install -m 644 config/etc/config/${APP} ${DESTDIR}${CONFIGDIR}/${APP}
 	[ -d ${DESTDIR}${INITDDIR} ] || mkdir -p ${DESTDIR}${INITDDIR}
-	install -m 755 config/initd_dropbear ${DESTDIR}${INITDDIR}/${APP}
+	install -m 755 config/etc/init.d/${APP} ${DESTDIR}${INITDDIR}/${APP}
 	[ -d ${DESTDIR}${RCDDIR} ] || mkdir -p ${DESTDIR}${RCDDIR}
 ifneq ($(START),)
 	(cd ${DESTDIR}${RCDDIR}; ln -sf ${INITDDIR}/${APP} S${START}${APP})

@@ -6,8 +6,8 @@ PROGRAM=mosquitto
 VERSION=-1.4.4
 PACKAGE=${PROGRAM}${VERSION}
 
-CFLAGS=-I${CURDIR}/../openssl/_install/usr/include
-LDFLAGS=-L${CURDIR}/../openssl/_install/usr/lib -lcrypto -lssl
+CFLAGS=-I${BUILDDIR}/openssl/_install/usr/include
+LDFLAGS=-L${BUILDDIR}/openssl/_install/usr/lib -lcrypto -lssl
 BUILD_OPTIONS=	WITH_TLS=no \
 		WITH_SRV=no \
 		WITH_UUID=no \

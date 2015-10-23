@@ -5,8 +5,8 @@ PROGRAM=
 VERSION=
 PACKAGE=
 
-START := $(shell ${CURDIR}/../tools/search_code config/initd_${APP} "START")
-STOP  := $(shell ${CURDIR}/../tools/search_code config/initd_${APP} "STOP")
+START := $(shell ${TOOLSDIR}/search_code config/initd_${APP} "START")
+STOP  := $(shell ${TOOLSDIR}/search_code config/initd_${APP} "STOP")
 
 all: build 
 
