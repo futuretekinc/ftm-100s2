@@ -1,4 +1,4 @@
-include ../Makefile.in
+include ${TOPDIR}/Makefile.in
 
 APP=net-snmp
 PROGRAM=${APP}

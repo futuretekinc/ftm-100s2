@@ -1,6 +1,6 @@
 include ${TOPDIR}/.config
 
-export BASE=${CONFIG_BASE}
+export PLATFORM=${CONFIG_PLATFORM}
 export MODEL=${CONFIG_MODEL}
 export HOST=arm-linux
 export TARGETMACH=arm-linux
@@ -18,6 +18,40 @@ export DESTDIR=${CURDIR}/_install
 CONFIGDIR=/etc/config
 INITDDIR=/etc/init.d
 RCDDIR=/etc/rc.d
+
+libs-y=
+libs-$(CONFIG_GMP) += gmp
+libs-$(CONFIG_PCRE) += pcre
+libs-$(CONFIG_LIBUBOX) += libubox 
+libs-$(CONFIG_ZLIB) += zlib 
+libs-$(CONFIG_QDECODER) += qdecoder 
+libs-$(CONFIG_LIBPCAP) += libpcap
+
+apps-y=
+apps-$(CONFIG_BASE) += base 
+apps-$(CONFIG_NETWORK) += network 
+apps-$(CONFIG_BUSYBOX) += busybox 
+apps-$(CONFIG_OPENSSL) += openssl 
+apps-$(CONFIG_IPTABLES) += iptables 
+apps-$(CONFIG_OPENSSH) += openssh 
+apps-$(CONFIG_TCPDUMP) += tcpdump 
+apps-$(CONFIG_LUA) += lua 
+apps-$(CONFIG_UCI) += uci 
+apps-$(CONFIG_STRONGSWAN) += strongswan 
+apps-$(CONFIG_HOTPLUG2) += hotplug2 
+apps-$(CONFIG_NTPCLIENT) += ntpclient 
+apps-$(CONFIG_DROPBEAR) += dropbear 
+apps-$(CONFIG_LIGHTTPD) += lighttpd 
+apps-$(CONFIG_WEBADMIN) += webadmin 
+apps-$(CONFIG_NET_SNMP) += net-snmp 
+apps-$(CONFIG_MOSQUITTO) += mosquitto 
+apps-$(CONFIG_UDHCPD) += udhcpd
+apps-$(CONFIG_WIRELESS_TOOLS) += wireless_tools
+apps-$(CONFIG_WIFI) += wifi
+apps-$(CONFIG_AP) += ap
+
+LIBS=libs-y
+APPS=apps-y
 
 define init_package
 	$(eval FILE_NAME := $1)

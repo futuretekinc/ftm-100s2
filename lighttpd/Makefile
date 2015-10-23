@@ -1,4 +1,4 @@
-include ../Makefile.in
+include ${TOPDIR}/Makefile.in
 
 APP=lighttpd
 VERSION=-1.4.37

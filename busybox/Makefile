@@ -1,4 +1,4 @@
-include ../Makefile.in
+include ${TOPDIR}/Makefile.in
 
 APP=busybox
 PROGRAM=${APP}
@@ -15,14 +15,14 @@ reinit:
 
 config: init
 	if [ ! -f .configured ] ; then \
-		awk -v destdir=${DESTDIR} '{ if ($$1 ~ /CONFIG_PREFIX/) {split($$1,vals,"="); printf "%s=\"%s\"\n", vals[1], destdir} else {print $$0} }' ${CURDIR}/config/config.ftm-100s2 > ${PACKAGE}/.config; \
+		awk -v destdir=${DESTDIR} '{ if ($$1 ~ /CONFIG_PREFIX/) {split($$1,vals,"="); printf "%s=\"%s\"\n", vals[1], destdir} else {print $$0} }' ${CURDIR}/config/config.${PLATFORM} > ${PACKAGE}/.config; \
 		make -C ${PACKAGE} oldconfig;\
 	fi
 	echo "yes" > .configured
 
 reconfig: 
 	rm -f .configured
-	[ -f .configured ] || (cp config/config.${BASE} ${PACKAGE}/.config; make -C ${PACKAGE} oldconfig)
+	[ -f .configured ] || (cp config/config.${PLATFORM} ${PACKAGE}/.config; make -C ${PACKAGE} oldconfig)
 	echo "yes" > .configured
 
 

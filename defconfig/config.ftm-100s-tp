@@ -1,5 +1,6 @@
-CONFIG_BASE=ftm-100s
+CONFIG_PLATFORM=ftm-100s
 CONFIG_MODEL=ftm-100s-tp
+CONFIG_CROSS=arm-openwrt-linux-uclibgnueabi-
 
 CONFIG_GMP=y
 CONFIG_PCRE=y
@@ -25,6 +26,6 @@ CONFIG_NET_SNMP=y
 CONFIG_MOSQUITTO=y
 CONFIG_NODE=y
 CONFIG_TPGW=y
-
-LIBS=gmp pcre libubox zlib qdecoder libpcap
-APPS=base network busybox openssl iptables openssh tcpdump lua uci strongswan hotplug2 ntpclient dropbear lighttpd webadmin net-snmp mosquitto node tpgw 
+CONFIG_WIRELESS_TOOLS=y
+CONFIG_WIFI=y
+CONFIG_AP=y
