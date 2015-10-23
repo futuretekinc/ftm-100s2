@@ -76,7 +76,6 @@ GTAGS
 *~
 \#*#
 
-Makefile
 CMakeCache.txt
 CMakeFiles
 *.cmake

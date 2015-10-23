@@ -77,7 +77,6 @@ GTAGS
 *~
 \#*#
 
-Makefile
 CMakeCache.txt
 CMakeFiles
 *.cmake
@@ -87,6 +86,3 @@ CMakeFiles
 *.dylib
 install_manifest.txt
 
-uci
-uci_config.h
-test/save
