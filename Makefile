@@ -1,6 +1,5 @@
-include .config
-
-ROOT=${CURDIR}/_root
+export ROOT=${CURDIR}/_root
+export TOPDIR=${CURDIR}
 
 include Makefile.in
 

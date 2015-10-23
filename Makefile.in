@@ -1,8 +1,10 @@
-export BASE=ftm-100s
-export MODEL=${BASE}-wips
+include ${TOPDIR}/.config
+
+export BASE=${CONFIG_BASE}
+export MODEL=${CONFIG_MODEL}
 export HOST=arm-linux
-export CROSS=arm-openwrt-linux-uclibcgnueabi-
 export TARGETMACH=arm-linux
+export CROSS=${CONFIG_CROSS}
 export CC=${CROSS}gcc
 export CXX=${CROSS}g++
 export AR=${CROSS}ar

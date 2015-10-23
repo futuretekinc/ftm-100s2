@@ -22,7 +22,7 @@ config: init
 
 reconfig: 
 	rm -f .configured
-	[ -f .configured ] || (cp config/config.ftm-100s2 ${PACKAGE}/.config; make -C ${PACKAGE} oldconfig)
+	[ -f .configured ] || (cp config/config.${BASE} ${PACKAGE}/.config; make -C ${PACKAGE} oldconfig)
 	echo "yes" > .configured
 
 
